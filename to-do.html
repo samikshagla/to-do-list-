@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> To-Do List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #129151;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding-top: 50px;
+        }
+        .todo-list {
+            background-color: rgb(240, 228, 126);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .todo-list h2 {
+            text-align: center;
+            color: #333;
+        }
+        .task-input {
+            margin-bottom: 20px;
+        }
+        .task-input input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .task-list {
+            margin-top: 20px;
+        }
+        .task-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            justify-content: space-between;
+        }
+        .task-item input {
+            margin-right: 10px;
+        }
+        .add-task-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        .add-task-btn:hover {
+            background-color: #45a049;
+        }
+        .delete-task-btn {
+            margin-left: 10px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .delete-task-btn:hover {
+            background-color: #d32f2f;
+        }
+        .delete-all-btn {
+            display: block;
+            width: 100%;
+            padding: 10px 20px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .delete-all-btn:hover {
+            background-color: #d32f2f;
+        }
+
+      
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .modal input, .modal textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .modal button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .modal button:hover {
+            background-color: #45a049;
+        }
+
+        .modal .cancel-btn {
+            background-color: #f44336;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="todo-list">
+        <h2> To-Do List</h2>
+       
+        <button class="add-task-btn" onclick="openTaskForm()">Add Task</button>
+
+       
+        <div id="taskFormModal" class="modal">
+            <div class="modal-content">
+                <h3>Create New Task</h3>
+                <label for="taskTitle">Title:</label>
+                <input type="text" id="taskTitle" placeholder="Enter task title">
+                <label for="taskDescription">Description:</label>
+                <textarea id="taskDescription" placeholder="Enter task description"></textarea>
+                <button onclick="addTaskFromForm()">Add Task</button>
+                <button class="cancel-btn" onclick="closeTaskForm()">Cancel</button>
+            </div>
+        </div>
+
+        <div class="task-list" id="task-list"></div>
+
+        <button class="delete-all-btn" onclick="deleteAllTasks()">Delete All Tasks</button>
+    </div>
+</div>
+
+<script>
+ 
+    function openTaskForm() {
+        document.getElementById('taskFormModal').style.display = 'block';
+    }
+
+    
+    function closeTaskForm() {
+        document.getElementById('taskFormModal').style.display = 'none';
+    }
+
+   
+    function addTaskFromForm() {
+        const taskTitle = document.getElementById('taskTitle').value.trim();
+        const taskDescription = document.getElementById('taskDescription').value.trim();
+
+       
+        if (!taskTitle || !taskDescription) {
+            alert("Please fill in both title and description!");
+            return;
+        }
+
+      
+        const taskDiv = document.createElement('div');
+        taskDiv.classList.add('task-item');
+
+       
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.onclick = function () {
+            if (checkbox.checked) {
+                taskDiv.style.textDecoration = 'line-through';
+            } else {
+                taskDiv.style.textDecoration = 'none';
+            }
+        };
+
+        
+        const titleSpan = document.createElement('span');
+        titleSpan.textContent = `Title: ${taskTitle}`;
+
+        
+        const descriptionSpan = document.createElement('span');
+        descriptionSpan.textContent = ` - Description: ${taskDescription}`;
+
+       
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.classList.add('delete-task-btn');
+        deleteButton.onclick = function () {
+            taskDiv.remove();
+        };
+
+       
+        taskDiv.appendChild(checkbox);
+        taskDiv.appendChild(titleSpan);
+        taskDiv.appendChild(descriptionSpan);
+        taskDiv.appendChild(deleteButton);
+
+     
+        const taskList = document.getElementById('task-list');
+        taskList.appendChild(taskDiv);
+
+       
+        closeTaskForm();
+        document.getElementById('taskTitle').value = '';
+        document.getElementById('taskDescription').value = '';
+    }
+
+    
+    function deleteAllTasks() {
+        const taskList = document.getElementById('task-list');
+        taskList.innerHTML = '';  
+    }
+</script>
+
+</body>
+</html>
